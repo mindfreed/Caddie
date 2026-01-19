@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Strategic Gamerz Caddie",
+  "version": "1.0.0",
+  "description": "Extract and analyze P2E offers from reward sites",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": [
+    "https://freecash.com/*",
+    "https://www.freecash.com/*",
+    "https://inboxdollars.com/*",
+    "https://www.inboxdollars.com/*",
+    "https://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://freecash.com/*", "https://www.freecash.com/*"],
+      "js": ["caddie-ui.js", "extractors/freecash.js"]
+    },
+    {
+      "matches": ["https://inboxdollars.com/*", "https://www.inboxdollars.com/*"],
+      "js": ["caddie-ui.js", "extractors/inboxdollars.js"]
+    },
+    {
+      "matches": ["https://*/*"],
+      "js": ["caddie-ui.js"]
+    }
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
