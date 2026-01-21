@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Caddy</title>
     <style>
-        /* 1. Nuke the Background */
         body, html {
             margin: 0;
             padding: 0;
@@ -14,34 +13,38 @@
             font-family: 'Courier New', Courier, monospace;
         }
 
-        /* 2. The Floating Prodigy (The "Button") */
         #prodigy-icon {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             background-image: url('/assets/caddy-mascot.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             z-index: 10000;
             cursor: pointer;
-            filter: drop-shadow(0 0 10px #BE00FC);
-            transition: transform 0.2s ease, filter 0.2s ease;
+            opacity: 0.4;
+            filter: drop-shadow(0 0 6px #BE00FC);
+            transition: all 0.3s ease;
         }
 
-        /* Interaction Effect */
+        #prodigy-icon.engaged {
+            width: 200px;
+            height: 200px;
+            opacity: 1;
+            filter: drop-shadow(0 0 15px #BE00FC);
+        }
+
         #prodigy-icon:active {
-            transform: scale(0.9);
-            filter: drop-shadow(0 0 5px #00ff80);
+            transform: scale(0.95);
         }
 
-        /* 3. The Briefing Bubble (Hidden by default) */
         #intel-bubble {
             display: none;
             position: fixed;
-            bottom: 120px;
+            bottom: 240px;
             right: 20px;
             width: 260px;
             background: rgba(0, 0, 0, 0.9);
@@ -54,12 +57,14 @@
             z-index: 9999;
         }
 
-        /* Text Styles */
-        h2 { margin: 0 0 10px 0; font-size: 14px; color: #BE00FC; text-transform: uppercase; }
-        p { margin: 0; font-size: 12px; line-height: 1.4; color: #fff; }
-        .stat-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 11px; color: #aaa; }
+        #intel-bubble.active {
+            display: block;
+        }
+
+        h2 { margin: 0 0 8px 0; font-size: 13px; color: #BE00FC; text-transform: uppercase; letter-spacing: 1px; }
+        p { margin: 0; font-size: 12px; line-height: 1.5; color: #fff; }
+        .stat-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 11px; color: #aaa; font-weight: bold; }
         
-        /* The "Marshal" Red Alert Style */
         .alert-state {
             border-color: #ff3333 !important;
             border-left-color: #ff3333 !important;
@@ -70,49 +75,51 @@
 <body>
 
     <div id="intel-bubble">
-        <h2>Alliance Intel</h2>
-        <p id="bubble-text">System Ready. Tap the Prodigy to deploy SnapScan.</p>
+        <h2>Eyes On Target</h2>
+        <p id="bubble-text">OVERSIGHT ACTIVE. GRID SECURE. TAP TO ACQUIRE TARGET.</p>
         <div class="stat-row">
-            <span id="risk-stat">RISK: LOW</span>
-            <span id="ev-stat">EV: --</span>
+            <span id="risk-stat">THREAT: --</span>
+            <span id="ev-stat">VALUE: --</span>
         </div>
     </div>
 
     <div id="prodigy-icon" onclick="toggleIntel()"></div>
 
     <script>
+        const icon = document.getElementById('prodigy-icon');
         const bubble = document.getElementById('intel-bubble');
         const text = document.getElementById('bubble-text');
         const riskStat = document.getElementById('risk-stat');
         const evStat = document.getElementById('ev-stat');
         
         let allianceStats = {};
+        let isEngaged = false;
 
-        // Load Alliance Stats on init
         fetch('/api/alliance-stats')
             .then(res => res.json())
             .then(data => {
                 allianceStats = data;
-                console.log("Caddy: Alliance Stats Loaded.", Object.keys(allianceStats).length, "games");
             })
-            .catch(e => console.error("Caddy: Failed to link to Alliance."));
+            .catch(e => {});
 
-        // 1. The Toggle Logic
         function toggleIntel() {
-            if (bubble.style.display === 'block') {
-                bubble.style.display = 'none';
-                bubble.classList.remove('alert-state');
-            } else {
-                bubble.style.display = 'block';
+            isEngaged = !isEngaged;
+            
+            if (isEngaged) {
+                icon.classList.add('engaged');
+                bubble.classList.add('active');
                 runSnapScan();
+            } else {
+                icon.classList.remove('engaged');
+                bubble.classList.remove('active');
+                bubble.classList.remove('alert-state');
             }
         }
 
-        // 2. Real SnapScan connected to CaddyCore
         async function runSnapScan() {
-            text.innerText = "SCANNING CLIPBOARD...";
-            riskStat.innerText = "RISK: --";
-            evStat.innerText = "EV: --";
+            text.innerText = "Scanning...";
+            riskStat.innerText = "THREAT: --";
+            evStat.innerText = "VALUE: --";
             bubble.classList.remove('alert-state');
             
             try {
@@ -124,21 +131,26 @@
                     
                     if (scoutReport) {
                         const isRisky = scoutReport.risk === 'high';
-                        text.innerHTML = `TARGET: <b>${rawText.toUpperCase()}</b><br>STATUS: <b>${isRisky ? 'RIPCORD ADVISORY' : 'SANCTIONED'}</b><br>CLIFF: <b>${scoutReport.cliff}</b>`;
-                        riskStat.innerText = `RISK: ${scoutReport.risk.toUpperCase()}`;
-                        evStat.innerText = `EV: $${scoutReport.ev}/hr`;
+                        const isMed = scoutReport.risk === 'med';
                         
                         if (isRisky) {
+                            text.innerHTML = `<b>${rawText.toUpperCase()}</b><br>Hold. High drag at <b>${scoutReport.cliff}</b>. Not worth your time.`;
                             bubble.classList.add('alert-state');
+                        } else if (isMed) {
+                            text.innerHTML = `<b>${rawText.toUpperCase()}</b><br>Proceed with caution. Watch for slowdown at <b>${scoutReport.cliff}</b>.`;
+                        } else {
+                            text.innerHTML = `<b>${rawText.toUpperCase()}</b><br>Clean shot. Push through <b>${scoutReport.cliff}</b> and collect.`;
                         }
+                        riskStat.innerText = `THREAT: ${scoutReport.risk.toUpperCase()}`;
+                        evStat.innerText = `VALUE: $${scoutReport.ev}/hr`;
                     } else {
-                        text.innerHTML = `TARGET: <b>${rawText.toUpperCase()}</b><br>STATUS: <b>UNKNOWN TERRAIN</b>`;
-                        riskStat.innerText = "RISK: ???";
-                        evStat.innerText = "EV: --";
+                        text.innerHTML = `<b>${rawText.toUpperCase()}</b><br>No intel. Uncharted. Proceed at own risk.`;
+                        riskStat.innerText = "THREAT: ???";
+                        evStat.innerText = "VALUE: --";
                     }
                 }, 600);
             } catch (err) {
-                text.innerText = "CLIPBOARD ACCESS DENIED. Enable permissions.";
+                text.innerText = "Need clipboard access. Check permissions.";
             }
         }
     </script>
