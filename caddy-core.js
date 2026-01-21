@@ -74,7 +74,39 @@ const CaddyCore = {
         
         if (status) status.innerText = "TERRAIN UNKNOWN";
         if (aiText) aiText.innerText = `The Alliance hasn't scouted "${title}" yet. Proceed with caution.`;
+    },
+
+    initGhostMode() {
+        const icon = document.getElementById('caddy-icon');
+        const briefing = document.getElementById('caddy-briefing');
+
+        if (icon && briefing) {
+            icon.addEventListener('click', () => {
+                const isHidden = briefing.style.display === 'none' || !briefing.classList.contains('active');
+                
+                if (isHidden) {
+                    briefing.classList.add('active');
+                    briefing.style.display = 'block';
+                    this.runSnapScan();
+                } else {
+                    briefing.classList.remove('active');
+                    briefing.style.display = 'none';
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!icon.contains(e.target) && !briefing.contains(e.target)) {
+                    briefing.classList.remove('active');
+                    briefing.style.display = 'none';
+                }
+            });
+
+            console.log("Caddy: Ghost Mode Activated");
+        }
     }
 };
 
-window.addEventListener('load', () => CaddyCore.init());
+window.addEventListener('load', () => {
+    CaddyCore.init();
+    CaddyCore.initGhostMode();
+});
