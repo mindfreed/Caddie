@@ -99,6 +99,32 @@ export class ScoutEngine {
     }
   }
 
+  async fetchKashKickIntel(gameName: string): Promise<IntelItem[]> {
+    try {
+      const searchUrl = `https://kashkick.com/earn`;
+      const { data } = await axios.get(searchUrl, {
+        headers: { 'User-Agent': 'FreedmindCaddy/1.0' }
+      });
+      const $ = cheerio.load(data);
+      
+      let offers: IntelItem[] = [];
+      $('[class*="offer"], [class*="game"], [class*="card"]').each((i, el) => {
+        const title = $(el).find('[class*="title"], h3, h4').text().trim().toLowerCase();
+        if (title.includes(gameName.toLowerCase())) {
+          offers.push({
+            title: $(el).find('[class*="title"], h3, h4').text().trim(),
+            snippet: $(el).find('[class*="desc"], p').text().trim().substring(0, 200),
+            source: 'KashKick'
+          });
+        }
+      });
+      return offers;
+    } catch (e: any) {
+      console.error("KashKick Scout Failed:", e.message);
+      return [];
+    }
+  }
+
   findStallPoints(allData: IntelItem[]): string[] {
     const stallPoints: string[] = [];
     const stallKeywords = ['stuck', 'stall', 'wall', 'cliff', 'impossible', 'paywall', 'p2w', 'days', 'weeks'];
@@ -119,19 +145,20 @@ export class ScoutEngine {
   }
 
   async triangulate(gameName: string): Promise<TriangulatedResult> {
-    const [reddit, bm, freecash] = await Promise.all([
+    const [reddit, bm, freecash, kashkick] = await Promise.all([
       this.fetchRedditIntel(gameName),
       this.fetchBeerMoneyIntel(gameName),
-      this.fetchFreecashAcademyIntel(gameName)
+      this.fetchFreecashAcademyIntel(gameName),
+      this.fetchKashKickIntel(gameName)
     ]);
 
-    const allData = [...reddit, ...bm, ...freecash];
+    const allData = [...reddit, ...bm, ...freecash, ...kashkick];
     
     return {
       game: gameName,
       allianceStats: {
         confidence: allData.length > 7 ? 'High' : 'Medium',
-        sources: ['Reddit', 'BeerMoney', 'Freecash Academy'],
+        sources: ['Reddit r/beermoney', 'Reddit r/beermoneyglobal', 'Freecash Academy', 'KashKick'],
         trackingStability: freecash.length > 0 ? (freecash[0].status || 'Unknown') : 'Unknown',
         identifiedStallPoints: this.findStallPoints(allData),
         lastUpdated: new Date().toISOString()
