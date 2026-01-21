@@ -1,0 +1,18 @@
+{
+  "monopoly go": { "hours": 45, "cliff": "Level 12", "ev": 0.88, "risk": "high" },
+  "dice dreams": { "hours": 15, "cliff": "Map 8", "ev": 2.50, "risk": "low" },
+  "bingo blitz": { "hours": 10, "cliff": "Level 70", "ev": 4.00, "risk": "low" },
+  "june's journey": { "hours": 30, "cliff": "Scene 10", "ev": 1.20, "risk": "med" },
+  "coin master": { "hours": 25, "cliff": "Village 8", "ev": 1.00, "risk": "med" },
+  "board kings": { "hours": 20, "cliff": "Board 15", "ev": 1.25, "risk": "med" },
+  "merge dragons": { "hours": 18, "cliff": "Challenge 21", "ev": 1.39, "risk": "med" },
+  "evony": { "hours": 40, "cliff": "Keep 17", "ev": 0.63, "risk": "high" },
+  "rise of kingdoms": { "hours": 50, "cliff": "CH 17", "ev": 0.50, "risk": "high" },
+  "state of survival": { "hours": 35, "cliff": "HQ 21", "ev": 0.71, "risk": "high" },
+  "raid shadow legends": { "hours": 22, "cliff": "Campaign 12", "ev": 1.14, "risk": "med" },
+  "pop slots": { "hours": 8, "cliff": "Level 32", "ev": 3.13, "risk": "low" },
+  "club vegas": { "hours": 6, "cliff": "Level 80", "ev": 4.17, "risk": "low" },
+  "huuuge casino": { "hours": 12, "cliff": "Level 200", "ev": 2.08, "risk": "low" },
+  "grand mafia": { "hours": 30, "cliff": "Mansion 15", "ev": 0.83, "risk": "high" },
+  "mafia city": { "hours": 35, "cliff": "Mansion 17", "ev": 0.71, "risk": "high" }
+}
