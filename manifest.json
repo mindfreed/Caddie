@@ -1,0 +1,24 @@
+{
+  "name": "Freedmind AI Caddy",
+  "short_name": "Caddy",
+  "description": "Scouting tool for optimizing time and profit using Alliance stats.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#00FF41",
+  "icons": [
+    {
+      "src": "assets/caddy-mascot.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/caddy-mascot.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
