@@ -77,6 +77,10 @@
     <div id="intel-bubble">
         <h2>Eyes On Target</h2>
         <p id="bubble-text">OVERSIGHT ACTIVE. GRID SECURE. TAP TO ACQUIRE TARGET.</p>
+        <div id="offer-input" style="margin: 10px 0; display: none;">
+            <input type="number" id="offer-amount" placeholder="Offer $" style="width: 80px; padding: 5px; background: #111; border: 1px solid #00ff80; color: #00ff80; font-family: inherit; font-size: 12px;">
+            <button onclick="recalculate()" style="padding: 5px 10px; background: #00ff80; color: #000; border: none; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: bold;">CALC</button>
+        </div>
         <div class="stat-row">
             <span id="risk-stat">THREAT: --</span>
             <span id="ev-stat">VALUE: --</span>
@@ -91,9 +95,13 @@
         const text = document.getElementById('bubble-text');
         const riskStat = document.getElementById('risk-stat');
         const evStat = document.getElementById('ev-stat');
+        const offerInput = document.getElementById('offer-input');
+        const offerAmount = document.getElementById('offer-amount');
         
         let allianceStats = {};
         let isEngaged = false;
+        let currentGame = null;
+        let currentStats = null;
 
         fetch('/api/alliance-stats')
             .then(res => res.json())
@@ -121,13 +129,16 @@
             riskStat.innerText = "THREAT: --";
             evStat.innerText = "VALUE: --";
             bubble.classList.remove('alert-state');
+            offerInput.style.display = 'none';
             
             try {
                 const rawText = await navigator.clipboard.readText();
                 const gameTitle = rawText.toLowerCase().trim();
+                currentGame = rawText;
                 
                 setTimeout(() => {
                     const scoutReport = allianceStats[gameTitle];
+                    currentStats = scoutReport;
                     
                     if (scoutReport) {
                         const isRisky = scoutReport.risk === 'high';
@@ -143,6 +154,7 @@
                         }
                         riskStat.innerText = `THREAT: ${scoutReport.risk.toUpperCase()}`;
                         evStat.innerText = `VALUE: $${scoutReport.ev}/hr`;
+                        offerInput.style.display = 'block';
                     } else {
                         text.innerHTML = `<b>${rawText.toUpperCase()}</b><br>No intel. Uncharted. Proceed at own risk.`;
                         riskStat.innerText = "THREAT: ???";
@@ -152,6 +164,34 @@
             } catch (err) {
                 text.innerText = "Need clipboard access. Check permissions.";
             }
+        }
+
+        function recalculate() {
+            const offer = parseFloat(offerAmount.value);
+            if (!offer || !currentStats || !currentGame) return;
+            
+            const hours = currentStats.hours || 30;
+            const customEV = (offer / hours).toFixed(2);
+            
+            let verdict = '';
+            let threat = 'LOW';
+            bubble.classList.remove('alert-state');
+            
+            if (customEV < 0.50) {
+                verdict = `$${offer} for ${hours}hrs? That's $${customEV}/hr. Hard pass.`;
+                threat = 'HIGH';
+                bubble.classList.add('alert-state');
+            } else if (customEV < 1.00) {
+                verdict = `$${offer} = $${customEV}/hr over ${hours}hrs. Marginal. Only if idle time.`;
+                threat = 'MED';
+            } else {
+                verdict = `$${offer} = $${customEV}/hr over ${hours}hrs. Solid rate. Execute.`;
+                threat = 'LOW';
+            }
+            
+            text.innerHTML = `<b>${currentGame.toUpperCase()}</b><br>${verdict}`;
+            riskStat.innerText = `THREAT: ${threat}`;
+            evStat.innerText = `VALUE: $${customEV}/hr`;
         }
     </script>
 </body>
