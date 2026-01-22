@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Freedmind AI Caddy",
+  "version": "1.0.0",
+  "description": "Strategic intelligence companion for mobile gamers. Scans offers, detects hazards, delivers tactical guidance.",
+  "permissions": ["clipboardRead", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["overlay.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
