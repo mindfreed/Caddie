@@ -1,0 +1,106 @@
+#caddy-overlay {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 2147483647;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#caddy-icon {
+    width: 60px;
+    height: 60px;
+    background-image: url('https://freedski42.replit.app/assets/caddy-mascot.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    opacity: 0.4;
+    filter: drop-shadow(0 0 6px #BE00FC);
+    transition: all 0.3s ease;
+}
+
+#caddy-icon.engaged {
+    width: 200px;
+    height: 200px;
+    opacity: 1;
+    filter: drop-shadow(0 0 15px #BE00FC);
+}
+
+#caddy-icon:active {
+    transform: scale(0.95);
+}
+
+#caddy-bubble {
+    display: none;
+    position: absolute;
+    bottom: 210px;
+    right: 0;
+    width: 260px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid #00ff80;
+    border-left: 5px solid #00ff80;
+    padding: 15px;
+    border-radius: 4px;
+    color: #00ff80;
+    box-shadow: 0 0 20px rgba(0, 255, 128, 0.2);
+}
+
+#caddy-bubble.active {
+    display: block;
+}
+
+#caddy-bubble.alert-state {
+    border-color: #ff3333 !important;
+    border-left-color: #ff3333 !important;
+    box-shadow: 0 0 20px rgba(255, 51, 51, 0.4) !important;
+}
+
+#caddy-bubble h2 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #BE00FC;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#caddy-bubble p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #fff;
+}
+
+#caddy-bubble .stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 11px;
+    color: #aaa;
+    font-weight: bold;
+}
+
+#caddy-offer-input {
+    margin: 10px 0;
+    display: none;
+}
+
+#caddy-offer-input input {
+    width: 80px;
+    padding: 5px;
+    background: #111;
+    border: 1px solid #00ff80;
+    color: #00ff80;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+#caddy-offer-input button {
+    padding: 5px 10px;
+    background: #00ff80;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: bold;
+}
